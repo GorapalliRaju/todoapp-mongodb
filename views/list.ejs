@@ -8,24 +8,25 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    
+    <div class="box" id="heading">
+        <h1><%=listTitle%></h1>
+    </div>
    <div class="box">
-
-    <% data.forEach((item)=>{ %>
+    <% for(let i=0;i<newListItems.length;i++){ %>
         <form action="/delete" method="post">
         <div class="item">
-            <input type="checkbox" name="checkbox" onchange="this.form.submit()" value=<%=item._id%> >
-        <p style="color:red"><%=item.name%></p>
+            <input type="checkbox" name="checkbox" onchange="this.form.submit()"  >
+        <p style="color:red"><%=newListItems[i].name%></p>
         </div>
         </form>
-        <% })%>
+        <% }%>
       
         </div>
    
    
    <form class="" action="/" method="post" >
     <input type="text" name="nxtitem" placeholder="new name">
-    <button type="submit" name="submit">+</button>
+    <button type="submit" name="list" value="<%= listTitle %>">+</button>
    </form>
 </body>
 </html>
