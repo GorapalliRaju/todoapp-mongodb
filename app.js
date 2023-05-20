@@ -2,12 +2,13 @@ const express=require("express");
 const app=express();
 const mongoose=require("mongoose");
 app.set('view engine','ejs');
-let items=["buy food","cook food","eat food"];
+//let items=["buy food","cook food","eat food"];
 const bodyparser=require("body-parser");
 //const mongoose=require("mongoose");
 app.use(express.urlencoded({extended:true}));
 app.use(bodyparser.urlencoded({extended:true}));
 app.use(express.static("public"));
+app.use(express.json());
 mongoose.connect("mongodb://0.0.0.0:27017/todolist",{useNewUrlParser:true}).then(()=>console.log("connected mongodb successfully"));
 const itemSchema=new mongoose.Schema({
     name:String,
@@ -23,7 +24,7 @@ const item2=new Item({
 const item3=new Item({
     name:"<--hit this to delete an item."
 });
-const defaultItems=[];
+const defaultItems=[item1,item2,item3];
 const da=async()=>{ 
   const res=await Item.insertMany([{name:'hello'},{name:'hii'}]);
 }
@@ -45,24 +46,7 @@ app.get("/",async(req,res)=>
     items:[itemSchema]
   }
   const data= Item.find();
-  const List=mongoose.model("List",ListSchema);
-  app.post("/", function(req, res){
-    const item = req.body.nxtitem;
-    const submitTitle = req.body.list;
-    const newItem = new Item({name:item});
-    const oldItem=new List({name:item});
-    const temp=[];
-    if(submitTitle == "today"){
-      newItem.save();
-      res.redirect("/");
-    }else{
-          oldItem.save();
-        res.redirect("/"+submitTitle);
-
-    }
-  });
-
-   
+  const List=mongoose.model("List",ListSchema); 
 app.post("/delete",(req,res)=>{
 const checkboxItemId=req.body.name;
 const {_id}=req.body;
@@ -85,6 +69,33 @@ app.get("/:customTitle", function(req,res){
       }
     }
   })
+});
+app.post("/", function(req, res){
+  const item = req.body.nxtitem;
+  const submitTitle = req.body.list;
+  const newItem = new Item({name:item});
+  const oldItem=new List({name:item});
+  const temp=[];
+  if(submitTitle == "today"){
+    newItem.save();
+    res.redirect("/");
+  }else{
+      
+    List.findOne({name: submitTitle}, function(err, foundList) {
+      if (!foundList) {
+        console.log("List not found")
+      } else {
+        const itemt = new Item ({
+          name: item
+        });
+        foundList.items.push(itemt);
+        foundList.save(function() {
+          res.redirect("/" +submitTitle);
+        });
+      };
+    });
+  };
+
 });
 app.listen(3080,function(req,res)
 {
