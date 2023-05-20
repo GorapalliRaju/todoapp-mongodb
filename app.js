@@ -63,7 +63,7 @@ app.get("/:customTitle", function(req,res){
           items:defaultItems
         })
         customLists.save();
-        res.redirect("/"+listCustomItem); //to redirecting to the new created route
+        res.redirect("/"+listCustomItem);
       }else{
         res.render("list", {listTitle:listCustomItem, newListItems:foundItem.items});
       }
